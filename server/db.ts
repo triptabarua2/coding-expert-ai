@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, conversations, messages, uploadedFiles } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,144 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+/**
+ * Conversation queries
+ */
+export async function createConversation(
+  userId: number,
+  language: string = "en"
+): Promise<{ id: number }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(conversations).values({
+    userId,
+    language,
+    title: "New Chat",
+  });
+
+  return { id: result[0].insertId as number };
+}
+
+export async function getConversations(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return db
+    .select()
+    .from(conversations)
+    .where(eq(conversations.userId, userId))
+    .orderBy((t) => desc(t.updatedAt));
+}
+
+export async function getConversationById(conversationId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db
+    .select()
+    .from(conversations)
+    .where(
+      and(
+        eq(conversations.id, conversationId),
+        eq(conversations.userId, userId)
+      )
+    )
+    .limit(1);
+
+  return result[0];
+}
+
+export async function updateConversationTitle(
+  conversationId: number,
+  title: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(conversations)
+    .set({ title })
+    .where(eq(conversations.id, conversationId));
+}
+
+export async function deleteConversation(conversationId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.delete(conversations).where(eq(conversations.id, conversationId));
+}
+
+/**
+ * Message queries
+ */
+export async function addMessage(
+  conversationId: number,
+  role: "user" | "assistant",
+  content: string,
+  codeBlocks?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(messages).values({
+    conversationId,
+    role,
+    content,
+    codeBlocks,
+  });
+
+  return { id: result[0].insertId as number };
+}
+
+export async function getConversationMessages(conversationId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return db
+    .select()
+    .from(messages)
+    .where(eq(messages.conversationId, conversationId))
+    .orderBy((t) => t.createdAt);
+}
+
+/**
+ * File upload queries
+ */
+export async function addUploadedFile(
+  conversationId: number,
+  fileName: string,
+  fileKey: string,
+  fileUrl: string,
+  fileSize: number,
+  mimeType: string,
+  language?: string,
+  messageId?: number
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(uploadedFiles).values({
+    conversationId,
+    fileName,
+    fileKey,
+    fileUrl,
+    fileSize,
+    mimeType,
+    language,
+    messageId,
+  });
+
+  return { id: result[0].insertId as number };
+}
+
+export async function getConversationFiles(conversationId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return db
+    .select()
+    .from(uploadedFiles)
+    .where(eq(uploadedFiles.conversationId, conversationId))
+    .orderBy((t) => desc(t.createdAt));
+}

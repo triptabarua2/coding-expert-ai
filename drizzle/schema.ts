@@ -25,4 +25,51 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+/**
+ * Conversations table - stores chat sessions for each user
+ */
+export const conversations = mysqlTable("conversations", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  title: varchar("title", { length: 255 }).notNull().default("New Chat"),
+  language: varchar("language", { length: 10 }).notNull().default("en"), // 'en' or 'bn'
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Conversation = typeof conversations.$inferSelect;
+export type InsertConversation = typeof conversations.$inferInsert;
+
+/**
+ * Messages table - stores individual messages in conversations
+ */
+export const messages = mysqlTable("messages", {
+  id: int("id").autoincrement().primaryKey(),
+  conversationId: int("conversationId").notNull().references(() => conversations.id, { onDelete: "cascade" }),
+  role: varchar("role", { length: 20 }).notNull(), // 'user' or 'assistant'
+  content: text("content").notNull(),
+  codeBlocks: text("codeBlocks"), // JSON array of code blocks
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Message = typeof messages.$inferSelect;
+export type InsertMessage = typeof messages.$inferInsert;
+
+/**
+ * UploadedFiles table - stores uploaded code files for review
+ */
+export const uploadedFiles = mysqlTable("uploadedFiles", {
+  id: int("id").autoincrement().primaryKey(),
+  conversationId: int("conversationId").notNull().references(() => conversations.id, { onDelete: "cascade" }),
+  messageId: int("messageId").references(() => messages.id, { onDelete: "set null" }),
+  fileName: varchar("fileName", { length: 255 }).notNull(),
+  fileKey: varchar("fileKey", { length: 512 }).notNull(), // S3 key
+  fileUrl: text("fileUrl").notNull(), // S3 URL
+  fileSize: int("fileSize").notNull(),
+  mimeType: varchar("mimeType", { length: 100 }).notNull(),
+  language: varchar("language", { length: 50 }), // Programming language detected
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type UploadedFile = typeof uploadedFiles.$inferSelect;
+export type InsertUploadedFile = typeof uploadedFiles.$inferInsert;
