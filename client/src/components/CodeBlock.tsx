@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/useTranslation";
+import hljs from "highlight.js";
 
 interface CodeBlockProps {
   code: string;
@@ -10,6 +11,19 @@ interface CodeBlockProps {
 export function CodeBlock({ code, language = "code" }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
   const { t } = useTranslation();
+  const codeRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!codeRef.current) return;
+    codeRef.current.removeAttribute("data-highlighted");
+    if (language && language !== "code" && hljs.getLanguage(language)) {
+      const result = hljs.highlight(code, { language });
+      codeRef.current.innerHTML = result.value;
+    } else {
+      const result = hljs.highlightAuto(code);
+      codeRef.current.innerHTML = result.value;
+    }
+  }, [code, language]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
@@ -36,8 +50,8 @@ export function CodeBlock({ code, language = "code" }: CodeBlockProps) {
           {copied ? "✓ " + t("copied") : t("copy")}
         </Button>
       </div>
-      <pre className="overflow-x-auto p-4 text-sm leading-relaxed text-slate-100 font-mono">
-        <code>{code}</code>
+      <pre className="overflow-x-auto p-4 text-sm leading-relaxed">
+        <code ref={codeRef} className={`hljs language-${language}`} />
       </pre>
     </div>
   );
