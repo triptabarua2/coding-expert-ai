@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+/* highlight.js: dark theme by default, overridden in light mode below */
+@import "highlight.js/styles/github-dark.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -175,3 +177,21 @@
     }
   }
 }
+
+/* Light mode: override hljs to github-light palette */
+:root:not(.dark) .hljs {
+  background: #f6f8fa;
+  color: #24292e;
+}
+:root:not(.dark) .hljs-comment,
+:root:not(.dark) .hljs-punctuation { color: #6a737d; }
+:root:not(.dark) .hljs-keyword,
+:root:not(.dark) .hljs-selector-tag { color: #d73a49; }
+:root:not(.dark) .hljs-string,
+:root:not(.dark) .hljs-attr { color: #032f62; }
+:root:not(.dark) .hljs-number,
+:root:not(.dark) .hljs-literal { color: #005cc5; }
+:root:not(.dark) .hljs-title,
+:root:not(.dark) .hljs-section { color: #6f42c1; }
+:root:not(.dark) .hljs-variable,
+:root:not(.dark) .hljs-template-variable { color: #e36209; }
