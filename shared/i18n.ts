@@ -50,7 +50,7 @@ export const translations = {
     fileName: "File name:",
     uploadSuccess: "File uploaded successfully",
     uploadError: "Error uploading file",
-    supportedFormats: "Supported: .js, .py, .java, .cpp, .go, .rs, .ts, .jsx, .tsx",
+    supportedFormats: "Supported: .js .ts .py .java .go .rs .cpp .cs .rb .php .swift .kt .dart .lua .zig .r .hs .ex .sql .html .css .sh and more",
 
     // Language Toggle
     language: "Language",
@@ -126,7 +126,7 @@ export const translations = {
     fileName: "ফাইলের নাম:",
     uploadSuccess: "ফাইল সফলভাবে আপলোড হয়েছে",
     uploadError: "ফাইল আপলোড করতে ত্রুটি",
-    supportedFormats: "সমর্থিত: .js, .py, .java, .cpp, .go, .rs, .ts, .jsx, .tsx",
+    supportedFormats: "সমর্থিত: .js .ts .py .java .go .rs .cpp .cs .rb .php .swift .kt .dart .lua .zig .r .hs .ex .sql .html .css .sh এবং আরো",
 
     // Language Toggle
     language: "ভাষা",
