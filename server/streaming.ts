@@ -89,10 +89,9 @@ export function registerStreamingRoutes(app: Express) {
           authorization: `Bearer ${ENV.forgeApiKey}`,
         },
         body: JSON.stringify({
-          model: "gemini-2.5-flash",
+          model: conv.model || "claude-sonnet-4-5",
           messages: llmMessages,
           max_tokens: 32768,
-          thinking: { budget_tokens: 128 },
           stream: true,
         }),
       });

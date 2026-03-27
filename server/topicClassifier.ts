@@ -25,8 +25,9 @@ export async function isCodingRelated(content: string): Promise<boolean> {
     const result = await invokeLLM({
       messages: [
         { role: "system", content: CLASSIFIER_SYSTEM_PROMPT },
-        { role: "user", content: content.slice(0, 500) }, // cap to avoid token waste
+        { role: "user", content: content.slice(0, 500) },
       ],
+      model: "claude-haiku-3-5", // fast + cheap for classification
       maxTokens: 5,
     });
 

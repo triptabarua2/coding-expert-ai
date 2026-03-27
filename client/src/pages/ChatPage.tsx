@@ -8,8 +8,10 @@ import { useStreamingChat } from "@/hooks/useStreamingChat";
 import { ConversationSidebar } from "@/components/ConversationSidebar";
 import { MessageDisplay } from "@/components/MessageDisplay";
 import { FileUploadButton, type SelectedFile } from "@/components/FileUploadButton";
+import { ModelSelector } from "@/components/ModelSelector";
 import { Button } from "@/components/ui/button";
 import { Menu, Send, Square, Sun, Moon, LogOut, Download } from "lucide-react";
+import { DEFAULT_MODEL_ID, type ModelId } from "../../../shared/models";
 import type { Message } from "../../../drizzle/schema";
 
 export default function ChatPage() {
@@ -24,6 +26,7 @@ export default function ChatPage() {
   const [activeConversationId, setActiveConversationId] = useState<number | null>(null);
   const [input, setInput] = useState("");
   const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(null);
+  const [selectedModel, setSelectedModel] = useState<ModelId>(DEFAULT_MODEL_ID);
   const [localMessages, setLocalMessages] = useState<Array<{ id: number; role: "user" | "assistant"; content: string; conversationId: number; codeBlocks: string | null; createdAt: Date }>>([]);
 
   const { sendMessage: streamSend, isStreaming, streamingContent, cancel } = useStreamingChat();
@@ -44,18 +47,26 @@ export default function ChatPage() {
     setLocalMessages(fetchedMessages as typeof localMessages);
   }, [fetchedMessages]);
 
+  // Sync model when active conversation changes
+  useEffect(() => {
+    if (!activeConversationId) return;
+    const conv = conversations.find((c) => c.id === activeConversationId);
+    if (conv?.model) setSelectedModel(conv.model);
+  }, [activeConversationId, conversations]);
+
   const messages = localMessages;
 
   // Mutations
   const createConvMutation = trpc.chat.createConversation.useMutation();
   const deleteConvMutation = trpc.chat.deleteConversation.useMutation();
+  const updateModelMutation = trpc.chat.updateModel.useMutation();
 
   // Initialize first conversation
   useEffect(() => {
     if (!user) return;
 
     if (conversations.length === 0) {
-      createConvMutation.mutate({ language }, {
+      createConvMutation.mutate({ language, model: selectedModel }, {
         onSuccess: (result) => {
           setActiveConversationId(result.id);
         },
@@ -135,8 +146,15 @@ export default function ChatPage() {
     );
   };
 
+  const handleModelChange = (modelId: ModelId) => {
+    setSelectedModel(modelId);
+    if (activeConversationId) {
+      updateModelMutation.mutate({ conversationId: activeConversationId, model: modelId });
+    }
+  };
+
   const handleNewChat = () => {
-    createConvMutation.mutate({ language }, {
+    createConvMutation.mutate({ language, model: selectedModel }, {
       onSuccess: (result) => {
         setActiveConversationId(result.id);
         setSidebarOpen(false);
@@ -360,9 +378,14 @@ export default function ChatPage() {
                 placeholder={selectedFile ? "Add a message about this file..." : t("askQuestion")}
                 className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 resize-none min-h-12 max-h-32 font-mono text-sm"
               />
-              <p className="text-xs text-slate-500">
-                {t("bengaliSupport")}
-              </p>
+              <div className="flex items-center justify-between">
+                <ModelSelector
+                  value={selectedModel}
+                  onChange={handleModelChange}
+                  disabled={isStreaming}
+                />
+                <p className="text-xs text-slate-500">{t("bengaliSupport")}</p>
+              </div>
             </div>
             {isStreaming ? (
               <Button

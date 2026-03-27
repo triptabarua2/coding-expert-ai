@@ -33,6 +33,7 @@ export const conversations = mysqlTable("conversations", {
   userId: int("userId").notNull().references(() => users.id),
   title: varchar("title", { length: 255 }).notNull().default("New Chat"),
   language: varchar("language", { length: 10 }).notNull().default("en"), // 'en' or 'bn'
+  model: varchar("model", { length: 100 }).notNull().default("claude-sonnet-4-5"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

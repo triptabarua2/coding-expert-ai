@@ -24,14 +24,15 @@ export const appRouter = router({
     // Create a new conversation
     createConversation: protectedProcedure
       .input((val: unknown) => {
-        if (typeof val === "object" && val !== null && "language" in val) {
-          return val as { language?: string };
+        if (typeof val === "object" && val !== null) {
+          return val as { language?: string; model?: string };
         }
         return {};
       })
       .mutation(async ({ ctx, input }) => {
         const language = input.language || "en";
-        const result = await db.createConversation(ctx.user.id, language);
+        const model = input.model || "claude-sonnet-4-5";
+        const result = await db.createConversation(ctx.user.id, language, model);
         return result;
       }),
 
@@ -105,6 +106,7 @@ export const appRouter = router({
               { role: "system", content: systemPrompt },
               ...llmMessages,
             ],
+            model: conv.model || "claude-sonnet-4-5",
           });
 
           const assistantContent =
@@ -142,6 +144,21 @@ export const appRouter = router({
         const conv = await db.getConversationById(input.conversationId, ctx.user.id);
         if (!conv) throw new Error("Conversation not found");
         await db.deleteConversation(input.conversationId);
+        return { success: true };
+      }),
+
+    // Update conversation model
+    updateModel: protectedProcedure
+      .input((val: unknown) => {
+        if (typeof val === "object" && val !== null && "conversationId" in val && "model" in val) {
+          return val as { conversationId: number; model: string };
+        }
+        throw new Error("Invalid input");
+      })
+      .mutation(async ({ ctx, input }) => {
+        const conv = await db.getConversationById(input.conversationId, ctx.user.id);
+        if (!conv) throw new Error("Conversation not found");
+        await db.updateConversationModel(input.conversationId, input.model);
         return { success: true };
       }),
 
