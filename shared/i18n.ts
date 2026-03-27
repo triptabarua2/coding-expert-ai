@@ -3,7 +3,8 @@
  * Supports Bengali (bn) and English (en)
  */
 
-export type Language = "en" | "bn";
+// "auto" means AI replies in whatever language the user writes in
+export type Language = "auto" | "en" | "bn" | "hi" | "ar" | "zh" | "es" | "fr" | "de" | "ja" | "ko" | "pt" | "ru" | "tr" | "ur";
 
 export const translations = {
   en: {
@@ -50,7 +51,7 @@ export const translations = {
     fileName: "File name:",
     uploadSuccess: "File uploaded successfully",
     uploadError: "Error uploading file",
-    supportedFormats: "Supported: .js, .py, .java, .cpp, .go, .rs, .ts, .jsx, .tsx",
+    supportedFormats: "Supported: .js .ts .py .java .go .rs .cpp .cs .rb .php .swift .kt .dart .lua .zig .r .hs .ex .sql .html .css .sh and more",
 
     // Language Toggle
     language: "Language",
@@ -126,7 +127,7 @@ export const translations = {
     fileName: "ফাইলের নাম:",
     uploadSuccess: "ফাইল সফলভাবে আপলোড হয়েছে",
     uploadError: "ফাইল আপলোড করতে ত্রুটি",
-    supportedFormats: "সমর্থিত: .js, .py, .java, .cpp, .go, .rs, .ts, .jsx, .tsx",
+    supportedFormats: "সমর্থিত: .js .ts .py .java .go .rs .cpp .cs .rb .php .swift .kt .dart .lua .zig .r .hs .ex .sql .html .css .sh এবং আরো",
 
     // Language Toggle
     language: "ভাষা",
@@ -159,6 +160,13 @@ export const translations = {
   },
 };
 
-export function t(language: Language, key: keyof typeof translations.en): string {
-  return translations[language][key as keyof typeof translations[Language]] || key;
+// UI strings only exist for "en" and "bn"; all other languages fall back to English.
+type TranslationKey = keyof typeof translations.en;
+type SupportedUILang = keyof typeof translations;
+
+export function t(language: Language, key: TranslationKey): string {
+  const lang: SupportedUILang = (language in translations)
+    ? (language as SupportedUILang)
+    : "en";
+  return (translations[lang] as Record<string, string>)[key] ?? key;
 }

@@ -3,9 +3,36 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { Paperclip, X, FileCode } from "lucide-react";
 
 const SUPPORTED_EXTENSIONS = [
-  ".js", ".jsx", ".ts", ".tsx", ".py", ".java", ".cpp", ".c", ".cs",
-  ".go", ".rs", ".rb", ".php", ".swift", ".kt", ".html", ".css", ".json",
-  ".yaml", ".yml", ".sh", ".bash", ".sql", ".md",
+  // JavaScript / TypeScript
+  ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs",
+  // Python
+  ".py", ".pyw",
+  // JVM
+  ".java", ".kt", ".kts", ".scala", ".groovy",
+  // C family
+  ".c", ".h", ".cpp", ".cc", ".cxx", ".hpp", ".cs",
+  // Systems
+  ".go", ".rs", ".zig",
+  // Scripting
+  ".rb", ".php", ".lua", ".pl", ".pm",
+  // Mobile
+  ".swift", ".dart", ".m", ".mm",
+  // Web
+  ".html", ".htm", ".css", ".scss", ".sass", ".less", ".vue", ".svelte",
+  // Data / Config
+  ".json", ".jsonc", ".yaml", ".yml", ".toml", ".xml", ".csv", ".env",
+  // Shell
+  ".sh", ".bash", ".zsh", ".fish", ".ps1", ".bat", ".cmd",
+  // Database
+  ".sql", ".prisma",
+  // Functional
+  ".hs", ".elm", ".ex", ".exs", ".erl", ".clj", ".cljs", ".fs", ".fsx",
+  // Other
+  ".r", ".R", ".jl", ".nim", ".v", ".tf", ".hcl",
+  // Docs / Markup
+  ".md", ".mdx", ".rst", ".tex",
+  // Build / CI
+  ".dockerfile", ".makefile",
 ];
 
 const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
@@ -23,17 +50,55 @@ interface FileUploadButtonProps {
 }
 
 function detectLanguage(filename: string): string {
-  const ext = filename.slice(filename.lastIndexOf(".")).toLowerCase();
+  const lower = filename.toLowerCase();
+  // Special filenames without extensions
+  if (lower === "dockerfile") return "dockerfile";
+  if (lower === "makefile") return "makefile";
+
+  const ext = lower.slice(lower.lastIndexOf("."));
   const map: Record<string, string> = {
-    ".js": "javascript", ".jsx": "javascript", ".ts": "typescript",
-    ".tsx": "typescript", ".py": "python", ".java": "java",
-    ".cpp": "cpp", ".c": "c", ".cs": "csharp", ".go": "go",
-    ".rs": "rust", ".rb": "ruby", ".php": "php", ".swift": "swift",
-    ".kt": "kotlin", ".html": "html", ".css": "css", ".json": "json",
-    ".yaml": "yaml", ".yml": "yaml", ".sh": "bash", ".bash": "bash",
-    ".sql": "sql", ".md": "markdown",
+    // JavaScript / TypeScript
+    ".js": "javascript", ".jsx": "javascript", ".mjs": "javascript", ".cjs": "javascript",
+    ".ts": "typescript", ".tsx": "typescript",
+    // Python
+    ".py": "python", ".pyw": "python",
+    // JVM
+    ".java": "java", ".kt": "kotlin", ".kts": "kotlin",
+    ".scala": "scala", ".groovy": "groovy",
+    // C family
+    ".c": "c", ".h": "c", ".cpp": "cpp", ".cc": "cpp", ".cxx": "cpp", ".hpp": "cpp",
+    ".cs": "csharp",
+    // Systems
+    ".go": "go", ".rs": "rust", ".zig": "zig",
+    // Scripting
+    ".rb": "ruby", ".php": "php", ".lua": "lua", ".pl": "perl", ".pm": "perl",
+    // Mobile
+    ".swift": "swift", ".dart": "dart", ".m": "objectivec", ".mm": "objectivec",
+    // Web
+    ".html": "html", ".htm": "html", ".css": "css",
+    ".scss": "scss", ".sass": "scss", ".less": "less",
+    ".vue": "xml", ".svelte": "xml",
+    // Data / Config
+    ".json": "json", ".jsonc": "json", ".yaml": "yaml", ".yml": "yaml",
+    ".toml": "ini", ".xml": "xml", ".csv": "plaintext", ".env": "bash",
+    // Shell
+    ".sh": "bash", ".bash": "bash", ".zsh": "bash", ".fish": "bash",
+    ".ps1": "powershell", ".bat": "dos", ".cmd": "dos",
+    // Database
+    ".sql": "sql", ".prisma": "plaintext",
+    // Functional
+    ".hs": "haskell", ".elm": "elm", ".ex": "elixir", ".exs": "elixir",
+    ".erl": "erlang", ".clj": "clojure", ".cljs": "clojure",
+    ".fs": "fsharp", ".fsx": "fsharp",
+    // Other
+    ".r": "r", ".jl": "julia", ".nim": "nim",
+    ".tf": "hcl", ".hcl": "hcl",
+    // Docs
+    ".md": "markdown", ".mdx": "markdown", ".rst": "plaintext", ".tex": "latex",
+    // Build
+    ".dockerfile": "dockerfile", ".makefile": "makefile",
   };
-  return map[ext] || "code";
+  return map[ext] || "plaintext";
 }
 
 export function FileUploadButton({ onFileSelect, selectedFile, disabled }: FileUploadButtonProps) {

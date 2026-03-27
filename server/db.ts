@@ -94,7 +94,8 @@ export async function getUserByOpenId(openId: string) {
  */
 export async function createConversation(
   userId: number,
-  language: string = "en"
+  language: string = "en",
+  model: string = "claude-sonnet-4-5"
 ): Promise<{ id: number }> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -102,10 +103,24 @@ export async function createConversation(
   const result = await db.insert(conversations).values({
     userId,
     language,
+    model,
     title: "New Chat",
   });
 
   return { id: result[0].insertId as number };
+}
+
+export async function updateConversationModel(
+  conversationId: number,
+  model: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(conversations)
+    .set({ model })
+    .where(eq(conversations.id, conversationId));
 }
 
 export async function getConversations(userId: number) {

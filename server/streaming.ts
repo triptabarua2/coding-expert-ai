@@ -54,10 +54,21 @@ export function registerStreamingRoutes(app: Express) {
 
     // Topic guard
     if (!(await isCodingRelated(content))) {
-      const refusal =
-        conv.language === "bn"
-          ? "আমি শুধু কোডিং এ সাহায্য করি 🤖"
-          : "I only help with coding questions 🤖";
+      const { invokeLLM } = await import("./_core/llm");
+      let refusal = "I only help with coding questions 🤖";
+      try {
+        const r = await invokeLLM({
+          messages: [
+            { role: "system", content: "You are a coding assistant. The user sent a non-coding message. Politely tell them in the SAME language they used that you only help with coding questions. Keep it to one short sentence." },
+            { role: "user", content },
+          ],
+          model: "claude-haiku-3-5",
+          maxTokens: 60,
+        });
+        const txt = typeof r.choices?.[0]?.message?.content === "string"
+          ? r.choices[0].message.content.trim() : "";
+        if (txt) refusal = txt;
+      } catch { /* fallback */ }
       await db.addMessage(conversationId, "assistant", refusal);
       sendEvent("token", { text: refusal });
       sendEvent("done", { content: refusal });
@@ -67,7 +78,7 @@ export function registerStreamingRoutes(app: Express) {
 
     try {
       const history = await db.getConversationMessages(conversationId);
-      const systemPrompt = getSystemPrompt(conv.language as "en" | "bn");
+      const systemPrompt = getSystemPrompt(conv.language);
 
       const llmMessages = [
         { role: "system" as const, content: systemPrompt },
@@ -89,10 +100,9 @@ export function registerStreamingRoutes(app: Express) {
           authorization: `Bearer ${ENV.forgeApiKey}`,
         },
         body: JSON.stringify({
-          model: "gemini-2.5-flash",
+          model: conv.model || "claude-sonnet-4-5",
           messages: llmMessages,
           max_tokens: 32768,
-          thinking: { budget_tokens: 128 },
           stream: true,
         }),
       });
