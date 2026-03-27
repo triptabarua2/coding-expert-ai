@@ -15,6 +15,7 @@ export function useStreamingChat() {
     async (
       conversationId: number,
       content: string,
+      model: string,
       onToken: (token: string) => void,
       onDone: (fullContent: string) => void,
       onError: (msg: string) => void
@@ -31,7 +32,7 @@ export function useStreamingChat() {
         const response = await fetch("/api/chat/stream", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ conversationId, content }),
+          body: JSON.stringify({ conversationId, content, model }),
           signal: controller.signal,
         });
 

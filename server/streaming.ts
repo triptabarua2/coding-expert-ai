@@ -21,9 +21,10 @@ export function registerStreamingRoutes(app: Express) {
       return;
     }
 
-    const { conversationId, content } = req.body as {
+    const { conversationId, content, model } = req.body as {
       conversationId: number;
       content: string;
+      model?: string;
     };
 
     if (!conversationId || !content?.trim()) {
@@ -100,7 +101,7 @@ export function registerStreamingRoutes(app: Express) {
           authorization: `Bearer ${ENV.forgeApiKey}`,
         },
         body: JSON.stringify({
-          model: conv.model || "claude-sonnet-4-5",
+          model: model || conv.model || "claude-sonnet-4-5",
           messages: llmMessages,
           max_tokens: 32768,
           stream: true,

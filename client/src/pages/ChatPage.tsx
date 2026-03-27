@@ -116,6 +116,7 @@ export default function ChatPage() {
     await streamSend(
       activeConversationId,
       userMessage,
+      selectedModel,
       (_token) => {
         // tokens are shown via streamingContent
       },

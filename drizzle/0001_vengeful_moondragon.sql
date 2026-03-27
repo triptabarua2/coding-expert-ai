@@ -3,6 +3,7 @@ CREATE TABLE `conversations` (
 	`userId` int NOT NULL,
 	`title` varchar(255) NOT NULL DEFAULT 'New Chat',
 	`language` varchar(10) NOT NULL DEFAULT 'en',
+	`model` varchar(100) NOT NULL DEFAULT 'claude-sonnet-4-5',
 	`createdAt` timestamp NOT NULL DEFAULT (now()),
 	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `conversations_id` PRIMARY KEY(`id`)
