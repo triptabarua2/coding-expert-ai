@@ -81,11 +81,25 @@ export const appRouter = router({
         const codingRelated = await isCodingRelated(content);
 
         if (!codingRelated) {
-          const assistantMessage = conv.language === "bn"
-            ? "আমি শুধু কোডিং এ সাহায্য করি 🤖"
-            : "I only help with coding questions 🤖";
-          await db.addMessage(conversationId, "assistant", assistantMessage);
-          return { content: assistantMessage };
+          // Ask the LLM to refuse in the user's own language
+          const { invokeLLM } = await import("./_core/llm");
+          let refusalMsg = "I only help with coding questions 🤖";
+          try {
+            const refusal = await invokeLLM({
+              messages: [
+                { role: "system", content: "You are a coding assistant. The user sent a non-coding message. Politely tell them in the SAME language they used that you only help with coding questions. Keep it to one short sentence." },
+                { role: "user", content: content },
+              ],
+              model: "claude-haiku-3-5",
+              maxTokens: 60,
+            });
+            const txt = typeof refusal.choices?.[0]?.message?.content === "string"
+              ? refusal.choices[0].message.content.trim()
+              : "";
+            if (txt) refusalMsg = txt;
+          } catch { /* fallback to default */ }
+          await db.addMessage(conversationId, "assistant", refusalMsg);
+          return { content: refusalMsg };
         }
 
         try {
@@ -93,7 +107,7 @@ export const appRouter = router({
           const { invokeLLM } = await import("./_core/llm");
           const { getSystemPrompt } = await import("../shared/systemPrompts");
 
-          const systemPrompt = getSystemPrompt(conv.language as "en" | "bn");
+          const systemPrompt = getSystemPrompt(conv.language);
 
           // Format messages for LLM
           const llmMessages = messages.map((msg) => ({

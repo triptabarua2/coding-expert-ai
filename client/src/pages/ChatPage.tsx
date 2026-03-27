@@ -9,6 +9,7 @@ import { ConversationSidebar } from "@/components/ConversationSidebar";
 import { MessageDisplay } from "@/components/MessageDisplay";
 import { FileUploadButton, type SelectedFile } from "@/components/FileUploadButton";
 import { ModelSelector } from "@/components/ModelSelector";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/button";
 import { Menu, Send, Square, Sun, Moon, LogOut, Download } from "lucide-react";
 import { DEFAULT_MODEL_ID, type ModelId } from "../../../shared/models";
@@ -66,7 +67,7 @@ export default function ChatPage() {
     if (!user) return;
 
     if (conversations.length === 0) {
-      createConvMutation.mutate({ language, model: selectedModel }, {
+      createConvMutation.mutate({ language: language as string, model: selectedModel }, {
         onSuccess: (result) => {
           setActiveConversationId(result.id);
         },
@@ -154,7 +155,7 @@ export default function ChatPage() {
   };
 
   const handleNewChat = () => {
-    createConvMutation.mutate({ language, model: selectedModel }, {
+    createConvMutation.mutate({ language: language as string, model: selectedModel }, {
       onSuccess: (result) => {
         setActiveConversationId(result.id);
         setSidebarOpen(false);
@@ -254,17 +255,8 @@ export default function ChatPage() {
 
           {/* Controls */}
           <div className="flex items-center gap-2">
-            {/* Language Toggle */}
-            <button
-              onClick={() => setLanguage(language === "en" ? "bn" : "en")}
-              className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-                language === "en"
-                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
-                  : "bg-slate-800 text-slate-400 hover:bg-slate-700"
-              }`}
-            >
-              {language === "en" ? "EN" : "বাংলা"}
-            </button>
+            {/* Language Selector */}
+            <LanguageSelector value={language} onChange={setLanguage} />
 
             {/* Export */}
             {messages.length > 0 && (

@@ -3,7 +3,8 @@
  * Supports Bengali (bn) and English (en)
  */
 
-export type Language = "en" | "bn";
+// "auto" means AI replies in whatever language the user writes in
+export type Language = "auto" | "en" | "bn" | "hi" | "ar" | "zh" | "es" | "fr" | "de" | "ja" | "ko" | "pt" | "ru" | "tr" | "ur";
 
 export const translations = {
   en: {
@@ -159,6 +160,13 @@ export const translations = {
   },
 };
 
-export function t(language: Language, key: keyof typeof translations.en): string {
-  return translations[language][key as keyof typeof translations[Language]] || key;
+// UI strings only exist for "en" and "bn"; all other languages fall back to English.
+type TranslationKey = keyof typeof translations.en;
+type SupportedUILang = keyof typeof translations;
+
+export function t(language: Language, key: TranslationKey): string {
+  const lang: SupportedUILang = (language in translations)
+    ? (language as SupportedUILang)
+    : "en";
+  return (translations[lang] as Record<string, string>)[key] ?? key;
 }
