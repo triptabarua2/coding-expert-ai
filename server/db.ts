@@ -95,7 +95,7 @@ export async function getUserByOpenId(openId: string) {
 export async function createConversation(
   userId: number,
   language: string = "en",
-  model: string = "claude-sonnet-4-5"
+  model: string = "anthropic/claude-sonnet-4-5"
 ): Promise<{ id: number }> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

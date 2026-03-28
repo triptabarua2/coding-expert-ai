@@ -63,7 +63,7 @@ export function registerStreamingRoutes(app: Express) {
             { role: "system", content: "You are a coding assistant. The user sent a non-coding message. Politely tell them in the SAME language they used that you only help with coding questions. Keep it to one short sentence." },
             { role: "user", content },
           ],
-          model: "claude-haiku-3-5",
+          model: "anthropic/claude-haiku-4-5",
           maxTokens: 60,
         });
         const txt = typeof r.choices?.[0]?.message?.content === "string"
@@ -89,19 +89,16 @@ export function registerStreamingRoutes(app: Express) {
         })),
       ];
 
-      const apiUrl =
-        ENV.forgeApiUrl && ENV.forgeApiUrl.trim()
-          ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
-          : "https://forge.manus.im/v1/chat/completions";
-
-      const response = await fetch(apiUrl, {
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
           "content-type": "application/json",
-          authorization: `Bearer ${ENV.forgeApiKey}`,
+          authorization: `Bearer ${ENV.openrouterApiKey}`,
+          "HTTP-Referer": "https://github.com/triptabarua2/coding-expert-ai",
+          "X-Title": "Coding Expert AI",
         },
         body: JSON.stringify({
-          model: model || conv.model || "claude-sonnet-4-5",
+          model: model || conv.model || "anthropic/claude-sonnet-4-5",
           messages: llmMessages,
           max_tokens: 32768,
           stream: true,

@@ -60,15 +60,11 @@ pnpm dev
 |----------|----------|-------------|
 | `DATABASE_URL` | ✅ | MySQL connection string, e.g. `mysql://user:pass@host:3306/dbname` |
 | `JWT_SECRET` | ✅ | Secret used to sign session cookies (any long random string) |
-| `BUILT_IN_FORGE_API_KEY` | ✅ | API key for the Gemini / Forge LLM endpoint |
-| `BUILT_IN_FORGE_API_URL` | ✅ | Base URL for the LLM API (e.g. `https://forge.manus.im`) |
+| `OPENROUTER_API_KEY` | ✅ | API key from [openrouter.ai/keys](https://openrouter.ai/keys) |
 | `GOOGLE_CLIENT_ID` | ⚠️ | Google OAuth app client ID |
 | `GOOGLE_CLIENT_SECRET` | ⚠️ | Google OAuth app client secret |
 | `GITHUB_CLIENT_ID` | ⚠️ | GitHub OAuth app client ID |
 | `GITHUB_CLIENT_SECRET` | ⚠️ | GitHub OAuth app client secret |
-| `VITE_APP_ID` | optional | App ID (used by legacy Manus OAuth) |
-| `OAUTH_SERVER_URL` | optional | Manus OAuth server URL (legacy) |
-| `OWNER_OPEN_ID` | optional | openId of the admin user |
 | `PORT` | optional | HTTP port (default: `3000`) |
 
 > ⚠️ At least one OAuth provider (Google **or** GitHub) must be configured for login to work.

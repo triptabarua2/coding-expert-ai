@@ -31,7 +31,7 @@ export const appRouter = router({
       })
       .mutation(async ({ ctx, input }) => {
         const language = input.language || "en";
-        const model = input.model || "claude-sonnet-4-5";
+        const model = input.model || "anthropic/claude-sonnet-4-5";
         const result = await db.createConversation(ctx.user.id, language, model);
         return result;
       }),
@@ -90,7 +90,7 @@ export const appRouter = router({
                 { role: "system", content: "You are a coding assistant. The user sent a non-coding message. Politely tell them in the SAME language they used that you only help with coding questions. Keep it to one short sentence." },
                 { role: "user", content: content },
               ],
-              model: "claude-haiku-3-5",
+              model: "anthropic/claude-haiku-4-5",
               maxTokens: 60,
             });
             const txt = typeof refusal.choices?.[0]?.message?.content === "string"
@@ -120,7 +120,7 @@ export const appRouter = router({
               { role: "system", content: systemPrompt },
               ...llmMessages,
             ],
-            model: conv.model || "claude-sonnet-4-5",
+            model: conv.model || "anthropic/claude-sonnet-4-5",
           });
 
           const assistantContent =

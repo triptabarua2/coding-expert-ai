@@ -1,6 +1,7 @@
 /**
  * Available AI models for the coding assistant.
- * All models are served through the Forge API (OpenAI-compatible).
+ * All models are served through OpenRouter (https://openrouter.ai).
+ * Model IDs must use the full provider/model-name format required by OpenRouter.
  */
 
 export type ModelId = string;
@@ -19,8 +20,8 @@ export type AIModel = {
 export const AI_MODELS: AIModel[] = [
   // ── Anthropic Claude ────────────────────────────────────────────────────
   {
-    id: "claude-sonnet-4-5",
-    name: "Claude Sonnet 4.6",
+    id: "anthropic/claude-sonnet-4-5",
+    name: "Claude Sonnet 4.5",
     provider: "Anthropic",
     description: "Best for coding — deep reasoning, long context, precise output",
     strengths: ["Coding", "Debugging", "Code review", "Architecture"],
@@ -29,7 +30,7 @@ export const AI_MODELS: AIModel[] = [
     recommended: true,
   },
   {
-    id: "claude-opus-4-5",
+    id: "anthropic/claude-opus-4-5",
     name: "Claude Opus 4.5",
     provider: "Anthropic",
     description: "Most powerful Claude — complex multi-step coding tasks",
@@ -38,8 +39,8 @@ export const AI_MODELS: AIModel[] = [
     contextWindow: "200K",
   },
   {
-    id: "claude-haiku-3-5",
-    name: "Claude Haiku 3.5",
+    id: "anthropic/claude-haiku-4-5",
+    name: "Claude Haiku 4.5",
     provider: "Anthropic",
     description: "Fastest Claude — quick code completions and fixes",
     strengths: ["Quick fixes", "Autocomplete", "Simple tasks"],
@@ -48,7 +49,7 @@ export const AI_MODELS: AIModel[] = [
   },
   // ── Google Gemini ────────────────────────────────────────────────────────
   {
-    id: "gemini-2.5-pro",
+    id: "google/gemini-2.5-pro-preview",
     name: "Gemini 2.5 Pro",
     provider: "Google",
     description: "Google's most capable model — excellent at code and math",
@@ -57,7 +58,7 @@ export const AI_MODELS: AIModel[] = [
     contextWindow: "1M",
   },
   {
-    id: "gemini-2.5-flash",
+    id: "google/gemini-2.5-flash-preview",
     name: "Gemini 2.5 Flash",
     provider: "Google",
     description: "Fast and capable — great balance of speed and quality",
@@ -66,7 +67,7 @@ export const AI_MODELS: AIModel[] = [
     contextWindow: "1M",
   },
   {
-    id: "gemini-2.0-flash",
+    id: "google/gemini-2.0-flash-001",
     name: "Gemini 2.0 Flash",
     provider: "Google",
     description: "Stable and reliable for everyday coding tasks",
@@ -76,7 +77,7 @@ export const AI_MODELS: AIModel[] = [
   },
   // ── OpenAI GPT ───────────────────────────────────────────────────────────
   {
-    id: "gpt-4o",
+    id: "openai/gpt-4o",
     name: "GPT-4o",
     provider: "OpenAI",
     description: "OpenAI's flagship — strong at code generation and explanation",
@@ -85,7 +86,7 @@ export const AI_MODELS: AIModel[] = [
     contextWindow: "128K",
   },
   {
-    id: "gpt-4o-mini",
+    id: "openai/gpt-4o-mini",
     name: "GPT-4o Mini",
     provider: "OpenAI",
     description: "Lightweight GPT-4o — fast responses for simple tasks",
@@ -94,7 +95,7 @@ export const AI_MODELS: AIModel[] = [
     contextWindow: "128K",
   },
   {
-    id: "o3",
+    id: "openai/o3",
     name: "OpenAI o3",
     provider: "OpenAI",
     description: "Advanced reasoning model — best for hard algorithmic problems",
@@ -103,7 +104,7 @@ export const AI_MODELS: AIModel[] = [
     contextWindow: "200K",
   },
   {
-    id: "o4-mini",
+    id: "openai/o4-mini",
     name: "OpenAI o4-mini",
     provider: "OpenAI",
     description: "Fast reasoning model — good for coding with chain-of-thought",
@@ -113,7 +114,7 @@ export const AI_MODELS: AIModel[] = [
   },
   // ── Meta Llama ───────────────────────────────────────────────────────────
   {
-    id: "llama-3.3-70b",
+    id: "meta-llama/llama-3.3-70b-instruct",
     name: "Llama 3.3 70B",
     provider: "Meta",
     description: "Open-source powerhouse — strong coding capabilities",
@@ -122,7 +123,7 @@ export const AI_MODELS: AIModel[] = [
     contextWindow: "128K",
   },
   {
-    id: "llama-4-maverick",
+    id: "meta-llama/llama-4-maverick",
     name: "Llama 4 Maverick",
     provider: "Meta",
     description: "Latest Llama — multimodal with strong code understanding",
@@ -132,7 +133,7 @@ export const AI_MODELS: AIModel[] = [
   },
   // ── Mistral ──────────────────────────────────────────────────────────────
   {
-    id: "mistral-large-latest",
+    id: "mistralai/mistral-large-2411",
     name: "Mistral Large",
     provider: "Mistral",
     description: "European frontier model — excellent at code and reasoning",
@@ -141,7 +142,7 @@ export const AI_MODELS: AIModel[] = [
     contextWindow: "128K",
   },
   {
-    id: "codestral-latest",
+    id: "mistralai/codestral-2501",
     name: "Codestral",
     provider: "Mistral",
     description: "Purpose-built for code — trained on 80+ programming languages",
@@ -151,7 +152,7 @@ export const AI_MODELS: AIModel[] = [
   },
   // ── DeepSeek ─────────────────────────────────────────────────────────────
   {
-    id: "deepseek-v3",
+    id: "deepseek/deepseek-chat",
     name: "DeepSeek V3",
     provider: "DeepSeek",
     description: "Top open-source coding model — rivals GPT-4 on benchmarks",
@@ -160,7 +161,7 @@ export const AI_MODELS: AIModel[] = [
     contextWindow: "128K",
   },
   {
-    id: "deepseek-r1",
+    id: "deepseek/deepseek-r1",
     name: "DeepSeek R1",
     provider: "DeepSeek",
     description: "Reasoning-focused — great for complex debugging and algorithms",
@@ -170,7 +171,7 @@ export const AI_MODELS: AIModel[] = [
   },
 ];
 
-export const DEFAULT_MODEL_ID = "claude-sonnet-4-5";
+export const DEFAULT_MODEL_ID = "anthropic/claude-sonnet-4-5";
 
 export const PROVIDER_COLORS: Record<AIModel["provider"], string> = {
   Anthropic: "text-orange-400 bg-orange-400/10 border-orange-400/30",
