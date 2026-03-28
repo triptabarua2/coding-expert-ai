@@ -194,15 +194,40 @@ export async function addMessage(
   return { id: result[0].insertId as number };
 }
 
-export async function getConversationMessages(conversationId: number) {
+export async function getConversationMessages(conversationId: number, limit?: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  return db
+  let query = db
     .select()
     .from(messages)
-    .where(eq(messages.conversationId, conversationId))
-    .orderBy((t) => t.createdAt);
+    .where(eq(messages.conversationId, conversationId));
+
+  if (limit) {
+    // To get the LAST N messages in chronological order, we need to:
+    // 1. Sort by desc, limit N
+    // 2. Then sort those N messages by asc
+    const subquery = db
+      .select()
+      .from(messages)
+      .where(eq(messages.conversationId, conversationId))
+      .orderBy(desc(messages.createdAt))
+      .limit(limit);
+    
+    // Since Drizzle's MySQL driver might have issues with subqueries in this way,
+    // we'll fetch and sort in memory if limit is provided, or just return the limited set.
+    // For simplicity and reliability in this environment:
+    const results = await db
+      .select()
+      .from(messages)
+      .where(eq(messages.conversationId, conversationId))
+      .orderBy(desc(messages.createdAt))
+      .limit(limit);
+    
+    return results.reverse();
+  }
+
+  return query.orderBy((t) => t.createdAt);
 }
 
 /**

@@ -1,5 +1,5 @@
 /**
- * LLM-based topic classifier.
+ * LLM-based topic classifier and guard.
  * Returns true if the message is coding-related, false otherwise.
  * Falls back to a lightweight keyword check if the LLM call fails.
  */
@@ -45,4 +45,26 @@ export async function isCodingRelated(content: string): Promise<boolean> {
     console.warn("[TopicClassifier] LLM call failed, using keyword fallback:", err);
     return FALLBACK_KEYWORDS.test(content);
   }
+}
+
+/**
+ * Helper to get a polite refusal message in the user's language.
+ */
+export async function getRefusalMessage(content: string): Promise<string> {
+  let refusalMsg = "I only help with coding questions 🤖";
+  try {
+    const refusal = await invokeLLM({
+      messages: [
+        { role: "system", content: "You are a coding assistant. The user sent a non-coding message. Politely tell them in the SAME language they used that you only help with coding questions. Keep it to one short sentence." },
+        { role: "user", content: content },
+      ],
+      model: "anthropic/claude-haiku-4-5",
+      maxTokens: 60,
+    });
+    const txt = typeof refusal.choices?.[0]?.message?.content === "string"
+      ? refusal.choices[0].message.content.trim()
+      : "";
+    if (txt) refusalMsg = txt;
+  } catch { /* fallback */ }
+  return refusalMsg;
 }

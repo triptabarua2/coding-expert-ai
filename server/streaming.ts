@@ -8,7 +8,7 @@ import * as db from "./db";
 import { sdk } from "./_core/sdk";
 import { ENV } from "./_core/env";
 import { getSystemPrompt } from "../shared/systemPrompts";
-import { isCodingRelated } from "./topicClassifier";
+import { isCodingRelated, getRefusalMessage } from "./topicClassifier";
 
 export function registerStreamingRoutes(app: Express) {
   app.post("/api/chat/stream", async (req: Request, res: Response) => {
@@ -55,21 +55,7 @@ export function registerStreamingRoutes(app: Express) {
 
     // Topic guard
     if (!(await isCodingRelated(content))) {
-      const { invokeLLM } = await import("./_core/llm");
-      let refusal = "I only help with coding questions 🤖";
-      try {
-        const r = await invokeLLM({
-          messages: [
-            { role: "system", content: "You are a coding assistant. The user sent a non-coding message. Politely tell them in the SAME language they used that you only help with coding questions. Keep it to one short sentence." },
-            { role: "user", content },
-          ],
-          model: "anthropic/claude-haiku-4-5",
-          maxTokens: 60,
-        });
-        const txt = typeof r.choices?.[0]?.message?.content === "string"
-          ? r.choices[0].message.content.trim() : "";
-        if (txt) refusal = txt;
-      } catch { /* fallback */ }
+      const refusal = await getRefusalMessage(content);
       await db.addMessage(conversationId, "assistant", refusal);
       sendEvent("token", { text: refusal });
       sendEvent("done", { content: refusal });
@@ -78,7 +64,8 @@ export function registerStreamingRoutes(app: Express) {
     }
 
     try {
-      const history = await db.getConversationMessages(conversationId);
+      // Limit history to last 20 messages for context
+      const history = await db.getConversationMessages(conversationId, 20);
       const systemPrompt = getSystemPrompt(conv.language);
 
       const llmMessages = [
