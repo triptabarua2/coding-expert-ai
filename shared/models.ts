@@ -171,7 +171,7 @@ export const AI_MODELS: AIModel[] = [
   },
 ];
 
-export const DEFAULT_MODEL_ID = "anthropic/claude-sonnet-4-5";
+export const DEFAULT_MODEL_ID = "google/gemini-2.0-flash-exp:free";
 
 export const PROVIDER_COLORS: Record<AIModel["provider"], string> = {
   Anthropic: "text-orange-400 bg-orange-400/10 border-orange-400/30",
