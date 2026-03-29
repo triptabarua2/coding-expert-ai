@@ -270,3 +270,9 @@ export async function getConversationFiles(conversationId: number) {
     .where(eq(uploadedFiles.conversationId, conversationId))
     .orderBy((t) => desc(t.createdAt));
 }
+
+export async function deleteMessage(messageId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(messages).where(eq(messages.id, messageId));
+}
