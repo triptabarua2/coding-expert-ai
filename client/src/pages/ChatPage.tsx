@@ -324,10 +324,15 @@ export default function ChatPage() {
           ) : (
             messages.map((msg) => (
               <MessageDisplay
-                key={msg.id}
-                content={msg.content}
-                role={msg.role as "user" | "assistant"}
-              />
+  key={msg.id}
+  content={msg.content}
+  role={msg.role as "user" | "assistant"}
+  messageId={msg.id}
+  conversationId={activeConversationId!}
+  onDeleted={() => {
+    setLocalMessages(prev => prev.filter(m => m.id !== msg.id));
+  }}
+/>
             ))
           )}
 
