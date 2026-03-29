@@ -58,7 +58,7 @@ export async function getRefusalMessage(content: string): Promise<string> {
         { role: "system", content: "You are a coding assistant. The user sent a non-coding message. Politely tell them in the SAME language they used that you only help with coding questions. Keep it to one short sentence." },
         { role: "user", content: content },
       ],
-      model: "anthropic/claude-haiku-4-5",
+      model: "google/gemini-2.0-flash-exp:free",
       maxTokens: 60,
     });
     const txt = typeof refusal.choices?.[0]?.message?.content === "string"
