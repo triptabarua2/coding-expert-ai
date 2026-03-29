@@ -66,6 +66,16 @@ export const AI_MODELS: AIModel[] = [
     speed: "fast",
     contextWindow: "1M",
   },
+ {
+    id: "google/gemini-2.0-flash-exp:free",
+    name: "Gemini 2.0 Flash (Free)",
+    provider: "Google",
+    description: "Free tier — great for everyday coding tasks",
+    strengths: ["General coding", "Free", "Fast"],
+    speed: "fast",
+    contextWindow: "1M",
+    recommended: true,
+  }, 
   {
     id: "google/gemini-2.0-flash-001",
     name: "Gemini 2.0 Flash",
