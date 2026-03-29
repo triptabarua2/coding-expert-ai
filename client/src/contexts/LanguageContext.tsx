@@ -29,8 +29,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("language", lang);
   };
 
-  if (!mounted) return <>{children}</>;
-
   return (
     <LanguageContext.Provider value={{ language, setLanguage }}>
       {children}
