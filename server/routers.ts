@@ -112,7 +112,18 @@ export const appRouter = router({
           throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to get AI response" });
         }
       }),
-
+    
+deleteMessage: protectedProcedure
+  .input(z.object({
+    messageId: z.number(),
+    conversationId: z.number(),
+  }))
+  .mutation(async ({ ctx, input }) => {
+    const conv = await db.getConversationById(input.conversationId, ctx.user.id);
+    if (!conv) throw new TRPCError({ code: "NOT_FOUND", message: "Conversation not found" });
+    await db.deleteMessage(input.messageId);
+    return { success: true };
+  }),
     // Delete a conversation
     deleteConversation: protectedProcedure
       .input(z.object({
