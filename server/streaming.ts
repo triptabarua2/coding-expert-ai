@@ -85,7 +85,7 @@ export function registerStreamingRoutes(app: Express) {
           "X-Title": "Coding Expert AI",
         },
         body: JSON.stringify({
-          model: model || conv.model || "anthropic/claude-sonnet-4-5",
+          model: model || conv.model || "google/gemini-2.0-flash-exp:free",
           messages: llmMessages,
           max_tokens: 32768,
           stream: true,
